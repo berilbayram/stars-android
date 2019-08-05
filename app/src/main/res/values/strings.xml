@@ -1,3 +1,11 @@
 <resources>
-    <string name="app_name">Stars-android</string>
+    <string name="app_name">Bilkent SRS</string>
+    <string name="id">Bilkent ID</string>
+    <string name="password">Password</string>
+    <string name="remember_me">Remember me</string>
+    <string name="login">Login</string>
+    <string name="version">Version</string>
+    <string name="error">Error</string>
+    <string name="no_internet_connection">There is no internet connection.</string>
+    <string name="ok">OK</string>
 </resources>
