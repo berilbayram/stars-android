@@ -57,7 +57,7 @@ public class LoginActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        versionText.setText(stringBuilder.toString());
+                        Log.d("http", stringBuilder.toString());
                     }
                 });
             }
