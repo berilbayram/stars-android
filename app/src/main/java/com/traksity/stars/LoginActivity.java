@@ -26,6 +26,10 @@ public class LoginActivity extends AppCompatActivity {
     EditText usernameEditText;
     EditText passwordEditText;
 
+    /**
+     * Executed when the application view is created.
+     * @param savedInstanceState previous state
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,18 +47,24 @@ public class LoginActivity extends AppCompatActivity {
         //Set version information
         versionText = findViewById(R.id.version_info);
         versionText.setText(versionText.getText() + " " + version);
+        //Set the UI elements programatically.
         Button loginButton = findViewById(R.id.login_button);
         loginButton.setOnClickListener(loginButtonListener);
         passwordEditText = findViewById(R.id.password_input);
         usernameEditText = findViewById(R.id.username_input);
+        //Launch the network thread to get the Login page of SRS
         getLogin();
     }
 
+    /**
+     * Creates a network thread that downloads SRS login page.
+     */
     private void getLogin(){
         new Thread(new Runnable(){
             @Override
             public void run(){
                 final StringBuilder stringBuilder = new StringBuilder();
+                //Try to connect to the SRS, if can't throw an AlertDialog that says no connection.
                 try{
                     login = Jsoup.connect("https://stars.bilkent.edu.tr/srs")
                             .userAgent("Mozilla/5.0 (Linux; Android 4.4.2; Nexus 4 Build/KOT49H) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/34.0.1847.114 Mobile Safari/537.36\n")
@@ -77,10 +87,15 @@ public class LoginActivity extends AppCompatActivity {
         }).start();
     }
 
+    /**
+     * Creates a network thread that logs into the SRS and triggers the 2FA SMS from Bilkent servers
+     * @param form username-password form to be sent
+     */
     private void getSMS(final FormElement form){
         new Thread(new Runnable() {
             @Override
             public void run(){
+                //Try to submit the form, if can't throw an AlertDialog that says no connection.
                 try{
                     Document doc = form.submit().post();
                     Log.d("html", doc.toString());
@@ -96,15 +111,22 @@ public class LoginActivity extends AppCompatActivity {
         }).start();
     }
 
+    /**
+     * Declare a loginButtonListener that fills the form based on the user input.
+     */
     private View.OnClickListener loginButtonListener = new View.OnClickListener(){
         @Override
         public void onClick(View view){
+            //Try to connect to the SRS, if can't throw an AlertDialog that says no connection.
             try{
+                //Get the form from the Document
                 FormElement loginForm = (FormElement) login.getElementById("login-form");
                 Element username = loginForm.getElementById("LoginForm_username");
                 Element password = loginForm.getElementById("LoginForm_password");
+                //Fill the form
                 username.val(usernameEditText.getText().toString());
                 password.val(passwordEditText.getText().toString());
+                //launch getSMS() function using the loginForm
                 getSMS(loginForm);
             }
             catch(Exception e){
