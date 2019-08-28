@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) Traksity 2019.
+ * Written by beratalp
+ */
+
 package com.traksity.stars;
 
 import androidx.appcompat.app.AlertDialog;
