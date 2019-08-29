@@ -8,4 +8,5 @@
     <string name="error">Error</string>
     <string name="no_internet_connection">There is no internet connection.</string>
     <string name="ok">OK</string>
+    <string name="wrong_id_or_password">Wrong password or Bilkent ID number.</string>
 </resources>
