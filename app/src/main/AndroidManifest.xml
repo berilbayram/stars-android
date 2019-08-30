@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) Traksity 2019.
+  ~ Written by beratalp
+  -->
+
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.traksity.stars">
     <uses-permission android:name="android.permission.INTERNET"/>
@@ -17,6 +22,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
     </application>
 
 </manifest>
