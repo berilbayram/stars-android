@@ -1,17 +1,25 @@
+/*
+ * Copyright (c) Traksity 2019.
+ * Written by beratalp
+ */
+
 package com.traksity.stars;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.DialogInterface;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.InputType;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -19,6 +27,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.nodes.FormElement;
 
 import java.io.IOException;
+import java.text.Normalizer;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -26,10 +35,11 @@ public class LoginActivity extends AppCompatActivity {
     Document login;
     EditText usernameEditText;
     EditText passwordEditText;
+    EditText smsEntryEditText;
     Handler messageHandler = new Handler();
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         //Set the view layout from activity_login.xml
         setContentView(R.layout.activity_login);
@@ -51,6 +61,7 @@ public class LoginActivity extends AppCompatActivity {
         usernameEditText = findViewById(R.id.username_input);
         getLogin();
     }
+
 
     private void getLogin(){
         new Thread(new Runnable(){
@@ -80,8 +91,8 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void run(){
                 try {
-                    Document doc = form.submit().post();
-                    if (doc.toString().contains("Wrong password or Bilkent ID number.") ){
+                    login = form.submit().post();
+                    if (login.toString().contains("Wrong password or Bilkent ID number.") ){
                         displayWrongNameOrIdError();
                     }
                 } catch (Exception e){
@@ -91,29 +102,9 @@ public class LoginActivity extends AppCompatActivity {
         }).start();
     }
 
-    private View.OnClickListener loginButtonListener = new View.OnClickListener(){
-        @Override
-        public void onClick(View view){
-            try{
-                FormElement loginForm = (FormElement) login.getElementById("login-form");
-                Element username = loginForm.getElementById("LoginForm_username");
-                Element password = loginForm.getElementById("LoginForm_password");
-                username.val(usernameEditText.getText().toString());
-                password.val(passwordEditText.getText().toString());
-                getSMS(loginForm);
-            }
-            catch(Exception e){
-                AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this)
-                        .setTitle(R.string.error)
-                        .setMessage(R.string.no_internet_connection)
-                        .setNegativeButton(R.string.ok, null);
-                builder.show();
-                Log.d("error",e.toString());
-            }
-        }
-    };
 
-    public void displayNetworkError() {
+
+    public void displayNetworkError(){
         Runnable doDisplayError = new Runnable() {
             public void run() {
                 AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this)
@@ -126,7 +117,7 @@ public class LoginActivity extends AppCompatActivity {
         messageHandler.post(doDisplayError);
     }
 
-    public void displayWrongNameOrIdError() {
+    public void displayWrongNameOrIdError(){
         Runnable doDisplayError = new Runnable() {
             public void run() {
                 AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this)
@@ -139,5 +130,63 @@ public class LoginActivity extends AppCompatActivity {
         messageHandler.post(doDisplayError);
     }
 
+    private void enterSMS(){
+        Runnable enterSMSCode = new Runnable() {
+            @Override
+            public void run() {
+                AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this)
+                        .setTitle(R.string.enter_sms);
+                smsEntryEditText = new EditText(LoginActivity.this);
+                smsEntryEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
+                builder.setView(smsEntryEditText);
+                builder.setPositiveButton(R.string.ok, smsOkButtonListener);
+                builder.show();
+            }
+        };
+        messageHandler.post(enterSMSCode);
+    }
+
+
+    private View.OnClickListener loginButtonListener = new View.OnClickListener(){
+        @Override
+        public void onClick(View view){
+            try{
+                FormElement loginForm = (FormElement) login.getElementById("login-form");
+                Element username = loginForm.getElementById("LoginForm_username");
+                Element password = loginForm.getElementById("LoginForm_password");
+                username.val(usernameEditText.getText().toString());
+                password.val(passwordEditText.getText().toString());
+                getSMS(loginForm);
+                enterSMS();
+            }
+            catch(Exception e){
+                displayNetworkError();
+                Log.d("error",e.toString());
+            }
+        }
+    };
+
+    private DialogInterface.OnClickListener smsOkButtonListener = new DialogInterface.OnClickListener(){
+        @Override
+        public void onClick(DialogInterface dialogInterface, int i){
+            int SMSCode;
+            try{
+                SMSCode = Integer.parseInt(smsEntryEditText.getText().toString());
+            }
+            catch (Exception e){
+                AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this)
+                        .setTitle(R.string.error)
+                        .setMessage(R.string.no_verification_entered)
+                        .setNegativeButton(R.string.ok, null);
+                builder.show();
+            }
+            try{
+                FormElement smsForm = (FormElement) login.getElementById("");
+            }
+            catch (Exception e){
+
+            }
+        }
+    };
 }
 
