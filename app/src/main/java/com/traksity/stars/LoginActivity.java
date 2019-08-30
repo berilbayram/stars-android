@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -25,6 +26,7 @@ public class LoginActivity extends AppCompatActivity {
     Document login;
     EditText usernameEditText;
     EditText passwordEditText;
+    Handler messageHandler = new Handler();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,12 +64,8 @@ public class LoginActivity extends AppCompatActivity {
                     stringBuilder.append(login.toString());
                 }
                 catch(IOException ex){
-                    AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this)
-                            .setTitle(R.string.error)
-                            .setMessage(R.string.no_internet_connection)
-                            .setNegativeButton(R.string.ok, null);
+                   displayNetworkError();
                 }
-
                 runOnUiThread(new Runnable(){
                     @Override
                     public void run(){
@@ -83,20 +81,11 @@ public class LoginActivity extends AppCompatActivity {
             public void run(){
                 try {
                     Document doc = form.submit().post();
-                    if (doc.toString().contains("Wrong") || doc.toString().contains("Security Code")){
-                        AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this)
-                                .setTitle(R.string.error)
-                                .setMessage(R.string.wrong_id_or_password)
-                                .setNegativeButton(R.string.ok, null);
-                        builder.show();
+                    if (doc.toString().contains("Wrong password or Bilkent ID number.") ){
+                        displayWrongNameOrIdError();
                     }
-                }
-                catch (Exception e){
-                    AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this)
-                            .setTitle(R.string.error)
-                            .setMessage(R.string.no_internet_connection)
-                            .setNegativeButton(R.string.ok, null);
-                    builder.show();
+                } catch (Exception e){
+                    displayNetworkError();
                 }
             }
         }).start();
@@ -123,5 +112,32 @@ public class LoginActivity extends AppCompatActivity {
             }
         }
     };
+
+    public void displayNetworkError() {
+        Runnable doDisplayError = new Runnable() {
+            public void run() {
+                AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this)
+                        .setTitle(R.string.error)
+                        .setMessage(R.string.no_internet_connection)
+                        .setNegativeButton(R.string.ok, null);
+                builder.show();
+            }
+        };
+        messageHandler.post(doDisplayError);
+    }
+
+    public void displayWrongNameOrIdError() {
+        Runnable doDisplayError = new Runnable() {
+            public void run() {
+                AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this)
+                        .setTitle(R.string.error)
+                        .setMessage(R.string.wrong_id_or_password)
+                        .setNegativeButton(R.string.ok, null);
+                builder.show();
+            }
+        };
+        messageHandler.post(doDisplayError);
+    }
+
 }
 

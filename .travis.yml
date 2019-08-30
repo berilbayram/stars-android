@@ -1,0 +1,40 @@
+sudo: required
+
+language: android
+dist: trusty
+
+before_cache:
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -rf $HOME/.gradle/caches/*/plugin-resolution/
+
+cache:
+  directories:
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
+    - $HOME/.android/build-cache
+
+env:
+  global:
+    - ANDROID_API=29
+    - ANDROID_BUILD_TOOLS=29.0.0
+
+android:
+  components:
+    - tools
+    - tools # Running this twice get's the latest build tools (https://github.com/codepath/android_guides/wiki/Setting-up-Travis-CI)
+    - platform-tools
+    - android-${ANDROID_API}
+    - build-tools-${ANDROID_BUILD_TOOLS}
+    - extra
+
+script:
+  - ./gradlew clean test build
+
+notifications:
+  email:
+    recipients:
+      - beratalp@gmail.com
+      - berilbayram@gmail.com
+    on_success: never
+    on_failure: always
+    on_error: always
